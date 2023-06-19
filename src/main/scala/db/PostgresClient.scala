@@ -2,13 +2,15 @@ package db
 
 import akka.actor.ActorSystem
 import cats.effect.{ContextShift, IO}
+import cats.syntax.all._
+import doobie._
+import Fragments.{in, whereAndOpt}
 import doobie.implicits._
 import doobie.util.transactor.Transactor
 import doobie.util.transactor.Transactor.Aux
 import model._
 import settings.DatabaseConfig
 import wvlet.log.LogSupport
-
 class PostgresClient(databaseConfig: DatabaseConfig)(implicit actorSystem: ActorSystem)
     extends LogSupport {
 
@@ -54,8 +56,21 @@ class PostgresClient(databaseConfig: DatabaseConfig)(implicit actorSystem: Actor
         """.query[DataEntry].to[List].transact(transactor)
     }
 
-  }
+    def getDataEntriesBySupplierIds(supplierIds: List[SupplierId]): IO[List[DataEntry]] = {
 
+      val f1 = supplierIds.toNel.map(cs => in(fr"supplier_id", cs))
+
+      val q = fr"""
+          SELECT id, supplier_id, data_source_id, parameter_id, score
+          FROM data_entry""" ++ whereAndOpt(f1)
+
+      q.query[DataEntry]
+        .to[List]
+        .transact(transactor)
+
+    }
+
+  }
   class SupplierRepository(transactor: Transactor[IO]) {
     def create(supplier: Supplier): IO[Int] =
       sql"INSERT INTO supplier (id, name) VALUES (${supplier.id.id}, ${supplier.name}) ON CONFLICT DO NOTHING".update.run

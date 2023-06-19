@@ -43,25 +43,31 @@ class DbTest extends AnyFunSpec {
 
     }
 
-    it("should be able to insert dataSource") {
+    it("should be able to fetch dataSource") {
       val maybeDataSource = f.dbClient.dataSourceRepo.getById(f.testDataSource1.id).unsafeRunSync()
       assert(maybeDataSource.isDefined)
       assert(maybeDataSource.get.equals(f.testDataSource1))
     }
 
-    it(s"sohuld be able to insert parameters") {
+    it(s"sohuld be able to fetch parameters") {
       val maybeParameter = f.dbClient.parameterRepo.getById(f.testParameter1.id).unsafeRunSync()
       assert(maybeParameter.isDefined)
       assert(maybeParameter.get.equals(f.testParameter1))
     }
 
-    it("should be able to insert score") {
+    it("should be able to fetch score for 1 id") {
       val getDataEntry =
         f.dbClient.scoreRepo.getDataEntriesBySupplierId(f.testSupplier1.id).unsafeRunSync()
 
-      println(getDataEntry)
+      assert(getDataEntry.size == 3)
+    }
+    it("should be able to fetch score for several ids") {
+      val getDataEntry =
+        f.dbClient.scoreRepo
+          .getDataEntriesBySupplierIds(List(f.testSupplier1.id, f.testSupplier2.id))
+          .unsafeRunSync()
 
-      getDataEntry.foreach(println)
+      assert(getDataEntry.size == 4)
     }
   }
 
