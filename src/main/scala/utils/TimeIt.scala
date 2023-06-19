@@ -1,6 +1,5 @@
 package utils
 
-import org.slf4j.Logger
 import wvlet.log.LogSupport
 
 import scala.concurrent.duration.Duration
@@ -18,9 +17,11 @@ object TimeIt extends LogSupport {
       case Success(value) =>
         val endTime = System.nanoTime()
         val executionTimeNs = endTime - value._1
-        info(s"$name executed/instantiated in ${Duration.fromNanos(executionTimeNs).toMillis}ms")
+        info(s"$name executed in ${Duration.fromNanos(executionTimeNs).toMillis}ms")
         value._2
-      case Failure(exception) => throw new RuntimeException(s"failed to execute $name")
+      case Failure(exception) =>
+        error(s"failed to execute $name msg:${exception.getMessage}")
+        throw exception
     }
   }
 

@@ -1,0 +1,49 @@
+syntax = "proto3";
+option java_package = "responsibly.grpc";
+option java_outer_classname = "SustainabilityService";
+
+message Suppliers {
+  repeated SupplierId supplierId = 1;
+}
+
+message SupplierId {
+  string id = 1;
+}
+
+message DataSource {
+  string id = 1;
+}
+
+message AggregatedScore {
+  double score = 1;
+}
+
+message DataSourceScores {
+  repeated DataSource dataSources = 1;
+  AggregatedScore aggregatedScore = 2;
+}
+message Parameters {
+  string id = 1;
+  repeated DataSourceScores dataSourceScores = 2;
+}
+
+message ParameterScores {
+  repeated Parameters parameters = 1;
+  AggregatedScore aggregatedScore = 2;
+}
+
+message SupplierScore {
+  string id = 1;
+  repeated ParameterScores parameterScores = 2;
+  AggregatedScore aggregatedScore = 3;
+
+}
+
+message SupplierScores {
+  repeated SupplierScore supplierScore = 1;
+}
+
+service SustainabilityScoresService {
+  rpc retrieveScores(Suppliers) returns (SupplierScores);
+  rpc retrieveScoresStream(stream SupplierId) returns (stream SupplierScore);
+}
