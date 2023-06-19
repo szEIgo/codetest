@@ -34,10 +34,74 @@ class CalculationTest extends AnyFunSpec {
         SupplierScores(
           Map(f.supplier1.id -> parameterScores1, f.supplier2.id -> parameterSCores2),
           (parameterScores1.aggregatedScore + parameterSCores2.aggregatedScore) / 2))
+
     }
     it(
       "Use the ScoreCalculator to check whether the results are exactly equal to what is shown in the assignment description, " +
-        "with a weight being 1-1 Avg") {}
+        "with a weight being 1-1 Avg") {
+
+
+
+
+
+
+
+      val suppliers = f.listOfEntries
+        .groupBy(_.supplierId)
+        .map { case (supplierId, entries) =>
+          val parameterScores = entries
+            .groupBy(_.parameterId)
+            .collect {
+              case (parameterId, paramEntries) if paramEntries.exists(_.parameterId == parameterId) =>
+                paramEntries
+                  .groupBy(_.dataSourceId)
+                  .collect {
+                    case (dataSourceId, dataEntries) if dataEntries.exists(_.dataSourceId == dataSourceId) =>
+                      val map: Map[DataSourceId, BigDecimal] = dataEntries
+                        .collect {
+                          case DataEntry(_, _, zdataSourceId, _, zscore) if dataSourceId == zdataSourceId =>
+                            zdataSourceId -> zscore
+                        }.toMap
+                      DataSourceScores(map,map.values.sum/map.size)
+                  }
+            }
+
+
+//            .map( parameterScore => {
+//            val value: Map[DataSourceId, DataSourceScores] = parameterScore._2
+//            val sum: BigDecimal = parameterScore._2.values.map(_.aggregatedScore).sum
+//            parameterScore._1 -> value, sum)
+//            supplierId -> parameterScores
+//          }
+        }
+
+
+
+//      val suppliers = f.listOfEntries.groupBy(_.supplierId).map { tuple =>
+//        val value: immutable.Iterable[ParameterScores] = tuple._2.groupBy(_.parameterId).collect {
+//          case xObj@(paramId, entries) if entries.exists(_.parameterId == paramId) =>
+//            val parameterMapScores: Map[ParameterId, DataSourceScores] = entries.groupBy(_.dataSourceId).collect {
+//              case yObj@(dataSourceId, yEntries)
+//                if yEntries.exists(_.dataSourceId == dataSourceId) =>
+//                val dataSourceIdAndScores: Map[DataSourceId, BigDecimal] = yEntries.collect {
+//                  case DataEntry(_, _, zdataSourceId, _, zscore)
+//                    if dataSourceId == zdataSourceId =>
+//                    zdataSourceId -> zscore
+//                }.toMap
+//                paramId -> DataSourceScores(
+//                  dataSourceIdAndScores,
+//                  dataSourceIdAndScores.values.sum)
+//            }
+//            ParameterScores(parameterMapScores, parameterMapScores.values.map(_.aggregatedScore).sum)
+//        }
+//        println(s"øøøø$value")
+//        value
+//      }
+
+      SupplierScores(suppliers,)
+      println(s"#####$suppliers, \n #####${suppliers.size}")
+
+    }
 
   }
 

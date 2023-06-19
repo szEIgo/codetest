@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import db.{FlywayManager, PostgresClient}
 import rpc.server.AkkaHttpServer
+import services.ScoreCalculator
 import settings.{DatabaseConfig, ServerConfig}
 import utils.TimeIt
 import wvlet.log.LogSupport
@@ -19,7 +20,8 @@ object Init extends App with LogSupport {
   private val manager = new FlywayManager(dbConfig)
   val flywayManager: FlywayManager = TimeIt.measureExecutionTime("flyWay", manager)
   val db = TimeIt.measureExecutionTime("databaseClient", new PostgresClient(dbConfig))
-  val webServer = TimeIt.measureExecutionTime("webserver", new AkkaHttpServer(serverConfig, db))
+  val scoreCal = new ScoreCalculator(db)
+  val webServer = TimeIt.measureExecutionTime("webserver", new AkkaHttpServer(serverConfig, scoreCal))
 
   flywayManager.migrateDatabase()
   webServer.run()
