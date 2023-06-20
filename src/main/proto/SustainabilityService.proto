@@ -44,7 +44,21 @@ message SupplierScores {
   repeated SupplierScore supplierScore = 1;
 }
 
+message ChangeDataEntry {
+  string dataEntry = 1;
+  double score = 2;
+}
+
+message DataEntry {
+  string id = 1;
+  string supplierId = 2;
+  string parameterId = 3;
+  string dataSourceId = 4;
+  double score = 5;
+}
+
+
 service SustainabilityScoresService {
   rpc retrieveScores(Suppliers) returns (SupplierScores);
-  rpc retrieveScoresStream(stream SupplierId) returns (stream SupplierScore);
+  rpc editDataEntry(ChangeDataEntry) returns (DataEntry);
 }

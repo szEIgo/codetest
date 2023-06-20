@@ -38,14 +38,11 @@ class PostgresClient(databaseConfig: DatabaseConfig)(implicit actorSystem: Actor
           ON CONFLICT DO NOTHING
         """.update.run.transact(transactor)
 
-    def update(dataEntry: DataEntry): IO[Int] =
+    def update(entryId: String, score: BigDecimal): IO[Int] =
       sql"""
           UPDATE data_entry
-          SET supplier_id = ${dataEntry.supplierId.id},
-              data_source_id = ${dataEntry.dataSourceId.id},
-              parameter_id = ${dataEntry.parameterId.id},
-              score = ${dataEntry.score}
-          WHERE id = ${dataEntry.id}
+          SET score = ${score}
+          WHERE id = ${entryId}
         """.update.run.transact(transactor)
 
     def getDataEntriesBySupplierId(supplierId: SupplierId): IO[List[DataEntry]] = {
@@ -55,6 +52,15 @@ class PostgresClient(databaseConfig: DatabaseConfig)(implicit actorSystem: Actor
           WHERE supplier_id = ${supplierId.id}
         """.query[DataEntry].to[List].transact(transactor)
     }
+
+    def getById(entryId: String): IO[DataEntry] = {
+      sql"""
+        SELECT id, supplier_id, data_source_id, parameter_id, score
+        FROM data_entry
+        WHERE id = ${entryId}
+      """.query[DataEntry].to[List].transact(transactor)
+    }.map(_.head)
+
 
     def getDataEntriesBySupplierIds(supplierIds: List[SupplierId]): IO[List[DataEntry]] = {
 

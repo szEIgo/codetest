@@ -4,15 +4,16 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import responsibly.grpc._
-import rpc.services.SustainabilityScoreServiceImpl
-import services.ScoreCalculator
+import rpc.server.services.SustainabilityScoreServiceImpl
 import settings.ServerConfig
+import utils.{EditDataUtil, ScoreCalculator}
 import wvlet.log.LogSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class AkkaHttpServer(serverConfig: ServerConfig,
-                     scoreCalculator: ScoreCalculator)(
+                     scoreCalculator: ScoreCalculator,
+                     editData: EditDataUtil)(
     implicit actorSystem: ActorSystem)
     extends LogSupport {
 
@@ -22,7 +23,7 @@ class AkkaHttpServer(serverConfig: ServerConfig,
     implicit val ec: ExecutionContext = actorSystem.dispatcher
     // Create service handlers
     val service: HttpRequest => Future[HttpResponse] = SustainabilityScoresServiceHandler(
-      new SustainabilityScoreServiceImpl(scoreCalculator))
+      new SustainabilityScoreServiceImpl(scoreCalculator,editData))
 
     val binding = Http().newServerAt(serverConfig.host, serverConfig.port).bind(service)
 

@@ -17,6 +17,7 @@ lazy val root = (project in file("."))
         "org.tpolecat" %% "doobie-postgres" % "0.9.0",
         "org.tpolecat" %% "doobie-hikari" % "0.9.0",
         "org.wvlet.airframe" %% "airframe-log" % "20.12.1",
+        "org.slf4j" % "slf4j-jdk14" % "1.7.21",
         "org.flywaydb" % "flyway-core" % "8.0.3",
         "org.postgresql" % "postgresql" % "42.6.0",
         "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
