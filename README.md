@@ -21,7 +21,7 @@ Protobuf files:
 
 How to run:
 - sbt test (also adds data to the database)
-- sbt run (updates database, and provides a grpc server on specified port)
+- sbt run (Server or Client)
 - verySecret.env file has been bundled with the project
 
 
