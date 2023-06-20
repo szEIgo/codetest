@@ -1,8 +1,6 @@
 import model._
 import org.scalatest.funspec.AnyFunSpec
 
-import scala.collection.MapView
-
 class CalculationTest extends AnyFunSpec {
   val f = Fixture
   describe("it should be able to aggregate and calculate correct results") {
@@ -41,55 +39,7 @@ class CalculationTest extends AnyFunSpec {
     it(
       "Use the ScoreCalculator to check whether the results are exactly equal to what is shown in the assignment description, " +
         "with a weight being 1-1 Avg") {
-
-      val groupedEntries: Map[SupplierId, Map[ParameterId, Map[DataSourceId, List[DataEntry]]]] =
-        f.listOfEntries
-          .groupBy(_.supplierId)
-          .view
-          .mapValues(_.groupBy(_.parameterId).view.toMap.mapValues(_.groupBy(_.dataSourceId)).toMap)
-          .toMap
-
-      println(s"groupedEntries ${groupedEntries.view.toMap}")
-
-      val dataSourceScores = groupedEntries
-        .mapValues(_.flatMap {
-          case (_, paramEntries) =>
-            paramEntries.map {
-              case (_, dataEntries) =>
-                val dataSourceId = dataEntries.head.dataSourceId
-                val totalScore = dataEntries.map(_.score).sum
-                dataSourceId -> totalScore
-            }
-        })
-
-      println(s"dataSourceScores ${dataSourceScores.view.toMap}")
-
-      val parameterScores: MapView[DataSourceId, BigDecimal] = dataSourceScores
-        .flatMap {
-          case (supplierId, data) =>
-            data.toList
-              .groupBy(_._1)
-              .view
-              .mapValues(_.map(_._2).sum)
-              .map {
-                case (parameterId, totalScore) =>
-                  parameterId -> totalScore
-              }
-              .toList
-              .sortBy(_._1.id)
-        }
-        .groupBy(_._1)
-        .view
-        .mapValues(_.map(_._2).sum)
-
-      println(s"parameterScores ${parameterScores.view.toMap}")
-
-      val supplierScores: MapView[String, BigDecimal] = parameterScores.toList
-        .groupBy(_._1.id)
-        .view
-        .mapValues(_.map(_._2).sum)
-
-      println(s"supplierScores ${supplierScores.view.toMap}")
+      println(s"scores: ${SupplierScores.fromEntries(f.listOfEntries)}")
 
     }
   }
@@ -114,10 +64,29 @@ object Fixture {
   val dataSourceScore2: BigDecimal = 90
   val dataEntry2 = DataEntry("2", supplier1.id, dataSource1.id, parameter2.id, dataSourceScore2)
   val dataSourceScore3: BigDecimal = 10
-  val dataEntry3 = DataEntry("3", supplier1.id, dataSource2.id, parameter2.id, dataSourceScore3)
+  val dataEntry3 = DataEntry("3", supplier1.id, dataSource2.id, parameter1.id, dataSourceScore3)
   val dataSourceScore4: BigDecimal = 100
   val dataEntry4 = DataEntry("4", supplier2.id, dataSource1.id, parameter1.id, dataSourceScore4)
 
   val listOfEntries = List(dataEntry1, dataEntry2, dataEntry3, dataEntry4)
+
+
+
+
+  /*
+  supplier1 -> [50,90,10],
+          parameter1 -> [50]
+              avg -> [50]
+          parameter2 -> [90,10]
+              avg -> [50]
+  supplier2 -> [100]
+          parameter1 -> [100]
+              avg ->  [100]
+      avg -> [75
+
+
+   */
+
+
 
 }

@@ -12,6 +12,7 @@ message SupplierId {
 
 message DataSource {
   string id = 1;
+  double score = 2;
 }
 
 message AggregatedScore {
@@ -24,7 +25,7 @@ message DataSourceScores {
 }
 message Parameters {
   string id = 1;
-  repeated DataSourceScores dataSourceScores = 2;
+  DataSourceScores dataSourceScores = 2;
 }
 
 message ParameterScores {
@@ -34,7 +35,7 @@ message ParameterScores {
 
 message SupplierScore {
   string id = 1;
-  repeated ParameterScores parameterScores = 2;
+  ParameterScores parameterScores = 2;
   AggregatedScore aggregatedScore = 3;
 
 }
