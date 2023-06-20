@@ -27,7 +27,7 @@ How to run:
 
 
 
-if you need a fast potsgres:
+if you need a potsgres in a jiffy:
 ```
 docker run --rm --net=host --name responsibly-db -e POSTGRES_PASSWORD=responsibly -d postgres:14.8-bullseye
 
