@@ -1,7 +1,7 @@
 # Coding Test for a Responsible Company
 
 Prerequisites:
-- postgres
+- postgres or Docker
 - scala
 
 
