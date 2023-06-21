@@ -1,6 +1,8 @@
 import model._
 import org.scalatest.funspec.AnyFunSpec
 
+import scala.collection.immutable
+
 class CalculationTest extends AnyFunSpec {
   val f = Fixture
   describe("it should be able to aggregate and calculate correct results") {
@@ -39,7 +41,18 @@ class CalculationTest extends AnyFunSpec {
     it(
       "Use the ScoreCalculator to check whether the results are exactly equal to what is shown in the assignment description, " +
         "with a weight being 1-1 Avg") {
-      println(s"scores: ${SupplierScores.fromEntries(f.listOfEntries)}")
+      val scores = SupplierScores.fromEntries(f.listOfEntries)
+      println(s"scores: $scores")
+      assert(scores.aggregatedScore == 80)
+      val aggregatedParameterScores = scores.supplierScoreMap.map(_._2.aggregatedScore).toSeq
+      assert(aggregatedParameterScores.contains(100))
+      assert(aggregatedParameterScores.contains(60))
+      val aggregatedDataSourceScores = scores.supplierScoreMap.values.flatMap(_.parameterScoreMap.map(_._2.aggregatedScore)).toSeq
+      assert(aggregatedDataSourceScores.contains(100) && aggregatedDataSourceScores.contains(30), aggregatedDataSourceScores.contains(90))
+      val innerScores: Seq[BigDecimal] = scores.supplierScoreMap.values.flatMap(_.parameterScoreMap.flatMap(_._2.dataSourceScoresMap.values)).toSeq
+      assert(innerScores.contains(100) && innerScores.contains(50) && innerScores.contains(10) && innerScores.contains(90))
+
+
 
     }
   }
@@ -70,22 +83,6 @@ object Fixture {
 
   val listOfEntries = List(dataEntry1, dataEntry2, dataEntry3, dataEntry4)
 
-
-
-
-  /*
-  supplier1 -> [50,90,10],
-          parameter1 -> [50]
-              avg -> [50]
-          parameter2 -> [90,10]
-              avg -> [50]
-  supplier2 -> [100]
-          parameter1 -> [100]
-              avg ->  [100]
-      avg -> [75
-
-
-   */
 
 
 
