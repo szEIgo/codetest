@@ -2,7 +2,7 @@ package rpc.client
 
 import akka.actor.ActorSystem
 import akka.grpc.GrpcClientSettings
-import responsibly.grpc.{ChangeDataEntry, DataEntry, SupplierId, Suppliers, SustainabilityScoresServiceClient}
+import responsibly.grpc.{ChangeDataEntry, DataEntry, SupplierId, SupplierScores, Suppliers, SustainabilityScoresServiceClient}
 import settings.ServerConfig
 import wvlet.log.LogSupport
 
@@ -17,7 +17,7 @@ class AkkaGrpcClient(serverConfig: ServerConfig)(implicit actorSystem: ActorSyst
       .withTls(false)
   )
 
-  def retrieveScores(supplierIds: Seq[model.SupplierId]) = {
+  def retrieveScores(supplierIds: Seq[model.SupplierId]): Future[SupplierScores] = {
     grpcClient.retrieveScores(Suppliers(supplierIds.map(x => SupplierId(x.id))))
   }
 

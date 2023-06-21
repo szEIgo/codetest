@@ -13,13 +13,11 @@ import scala.concurrent.duration.DurationInt
 
 object Client extends App with LogSupport {
 
-  info("Initializing Server....")
+  info("Initializing Client....")
   private val config = ConfigFactory.load()
   private val serverConfig = ServerConfig.load(config)
-
   implicit val actorSystem = ActorSystem()
   implicit val ec = actorSystem.dispatcher
-
   val grpcClient = new AkkaGrpcClient(serverConfig)
 
   info("before manipulating data!!!")
@@ -30,7 +28,9 @@ object Client extends App with LogSupport {
       10.seconds))
 
   info("manipulating data!!")
-  Await.result(grpcClient.grpcClient.editDataEntry(ChangeDataEntry("data-entry-1", 8.0)), 10.seconds)
+  Await.result(
+    grpcClient.grpcClient.editDataEntry(ChangeDataEntry("data-entry-1", 8.0)),
+    10.seconds)
 
   info("after manipulating data!!!")
   info(
@@ -39,4 +39,8 @@ object Client extends App with LogSupport {
         .retrieveScores(Seq(SupplierId("supplier-2"), SupplierId("supplier-1"))),
       10.seconds))
 
+  info("RESET data!!")
+  Await.result(
+    grpcClient.grpcClient.editDataEntry(ChangeDataEntry("data-entry-1", 50.0)),
+    10.seconds)
 }

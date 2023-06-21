@@ -27,7 +27,6 @@ class PostgresClient(databaseConfig: DatabaseConfig)(implicit actorSystem: Actor
   val supplierRepo = new SupplierRepository(transactor)
   val dataSourceRepo = new DataSourceRepository(transactor)
   val parameterRepo = new ParameterRepository(transactor)
-
   val scoreRepo = new ScoreRepository(transactor)
 
   class ScoreRepository(transactor: Transactor[IO]) {
@@ -97,6 +96,7 @@ class PostgresClient(databaseConfig: DatabaseConfig)(implicit actorSystem: Actor
   }
 
   class DataSourceRepository(transactor: Transactor[IO]) {
+
     def create(dataSource: DataSource): IO[Int] =
       sql"INSERT INTO data_source (id, name) VALUES (${dataSource.id.id}, ${dataSource.name}) ON CONFLICT DO NOTHING".update.run
         .transact(transactor)

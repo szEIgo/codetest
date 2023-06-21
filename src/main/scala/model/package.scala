@@ -52,6 +52,7 @@ package object model {
 
     }
   }
+
   object ParameterScores {
     def fromEntries(supplierId: SupplierId, listOfDataEntries: List[DataEntry]) = {
       val parameters =
@@ -61,7 +62,6 @@ package object model {
       ParameterScores(parameters, parameters.values.map(_.aggregatedScore).sum / parameters.size)
     }
   }
-
   case class SupplierScores(
       supplierScoreMap: Map[SupplierId, ParameterScores],
       aggregatedScore: BigDecimal) {
@@ -76,6 +76,7 @@ package object model {
               aggregatedScore = Some(AggregatedScore(aggregatedScore.doubleValue)))).toSeq)
     }
   }
+
   object SupplierScores {
     def fromEntries(listOfDataEntries: List[DataEntry]) = {
       val suppliers = listOfDataEntries
@@ -84,5 +85,8 @@ package object model {
       SupplierScores(suppliers, suppliers.values.map(_.aggregatedScore).sum / suppliers.size)
     }
   }
+
+
+
 
 }
